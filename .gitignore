@@ -1,0 +1,51 @@
+# ## Technical Roundup (Gaming Tech: Unity Git Management)
+# Standard .gitignore for Unity 2022/2023+
+
+# ---
+# ### Machine-specific and Temporary Files
+[Library]/
+[Temp]/
+[Obj]/
+[Build]/
+[Builds]/
+[Logs]/
+[MemoryCaptures]/
+[UserSettings]/
+
+# ---
+# ### Asset Metadata & Cache
+# Unity generates these automatically from your Assets folder
+Assets/AssetStoreTools*
+/Assets/Plugins/Editor/JetBrains*
+.collabignore
+
+# ---
+# ### IDE / Solution Files
+# These are specific to your local setup (VS Code, Visual Studio, Rider)
+.vs/
+.vscode/
+.gradle/
+ExportedObj/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+*.pdb
+*.opendb
+*.VC.db
+
+# ---
+# ### OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
