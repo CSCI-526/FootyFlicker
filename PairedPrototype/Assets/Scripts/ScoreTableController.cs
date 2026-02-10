@@ -7,7 +7,11 @@ public class ScoreTableController : MonoBehaviour
     public float gameDuration = 60f;
     public Coin2DController coin;
 
-    TextMeshProUGUI scoreText, timerText, coinInventoryText, instructionsText, meterDisplayText, gameOverText;
+    TextMeshProUGUI timerText;
+    TextMeshProUGUI coinText;
+    TextMeshProUGUI instructionsText; 
+    TextMeshProUGUI meterDisplayText;
+    TextMeshProUGUI gameOverText;
     int currentScore = 0;
     float timeRemaining;
     bool isGameOver = false;
@@ -19,7 +23,10 @@ public class ScoreTableController : MonoBehaviour
     void Start()
     {
         timeRemaining = gameDuration;
-        if (coin == null) coin = FindFirstObjectByType<Coin2DController>();
+        if (coin == null)
+        {
+            coin = FindFirstObjectByType<Coin2DController>();
+        }   
         CreateUI();
     }
 
@@ -36,44 +43,49 @@ public class ScoreTableController : MonoBehaviour
             canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
         }
 
-        scoreText = MakeText("ScoreText", new Vector2(20, -20), 32, TextAlignmentOptions.TopLeft);
+        timerText = MakeText("Timer", new Vector2(-20, -20), 32);
+        timerText.rectTransform.anchorMin = new Vector2(1, 1);
+        timerText.rectTransform.anchorMax = new Vector2(1, 1);
+        timerText.rectTransform.pivot = new Vector2(1, 1);
 
-        timerText = MakeText("TimerText", new Vector2(-20, -20), 32, TextAlignmentOptions.TopRight);
-        timerText.rectTransform.anchorMin = timerText.rectTransform.anchorMax = timerText.rectTransform.pivot = new Vector2(1, 1);
+        coinText = MakeText("ScoreCoins", new Vector2(0, -20), 24, new Vector2(500, 100));
+        coinText.rectTransform.anchorMin = new Vector2(0.5f, 1);
+        coinText.rectTransform.anchorMax = new Vector2(0.5f, 1);
+        coinText.rectTransform.pivot = new Vector2(0.5f, 1);
 
-        coinInventoryText = MakeText("CoinInventoryText", new Vector2(0, -20), 24, TextAlignmentOptions.Top, new Vector2(500, 100));
-        coinInventoryText.rectTransform.anchorMin = coinInventoryText.rectTransform.anchorMax = coinInventoryText.rectTransform.pivot = new Vector2(0.5f, 1);
+        instructionsText = MakeText("Instructions", new Vector2(20, 20), 24, new Vector2(450, 80));
+        instructionsText.rectTransform.anchorMin = Vector2.zero;
+        instructionsText.rectTransform.anchorMax = Vector2.zero;
+        instructionsText.rectTransform.pivot = Vector2.zero;
 
-        instructionsText = MakeText("InstructionsText", new Vector2(20, 20), 24, TextAlignmentOptions.BottomLeft, new Vector2(450, 80));
-        instructionsText.rectTransform.anchorMin = instructionsText.rectTransform.anchorMax = instructionsText.rectTransform.pivot = Vector2.zero;
+        meterDisplayText = MakeText("Meter", new Vector2(0, 100), 24, new Vector2(500, 80));
+        meterDisplayText.rectTransform.anchorMin = new Vector2(0.5f, 0);
+        meterDisplayText.rectTransform.anchorMax = new Vector2(0.5f, 0);
+        meterDisplayText.rectTransform.pivot = new Vector2(0.5f, 0);
 
-        meterDisplayText = MakeText("MeterText", new Vector2(0, 100), 24, TextAlignmentOptions.Center, new Vector2(500, 80));
-        meterDisplayText.rectTransform.anchorMin = meterDisplayText.rectTransform.anchorMax = meterDisplayText.rectTransform.pivot = new Vector2(0.5f, 0);
-
-        gameOverText = MakeText("GameOverText", Vector2.zero, 32, TextAlignmentOptions.Center, new Vector2(500, 250));
-        gameOverText.rectTransform.anchorMin = gameOverText.rectTransform.anchorMax = gameOverText.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        gameOverText = MakeText("GameOver", Vector2.zero, 32, new Vector2(500, 250));
+        gameOverText.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        gameOverText.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        gameOverText.rectTransform.pivot = new Vector2(0.5f, 0.5f);
         gameOverText.gameObject.SetActive(false);
     }
 
-    TextMeshProUGUI MakeText(string name, Vector2 pos, int size, TextAlignmentOptions align, Vector2? customSize = null)
+    //Uses TextMeshProGUI to create and format text elements in the game
+    TextMeshProUGUI MakeText(string name, Vector2 pos, int size, Vector2? customSize = null)
     {
         var obj = new GameObject(name);
         obj.transform.SetParent(canvas.transform, false);
-        var rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
-        rect.anchoredPosition = pos;
-        rect.sizeDelta = customSize ?? new Vector2(250, 40);
         var text = obj.AddComponent<TextMeshProUGUI>();
         text.fontSize = size;
-        text.alignment = align;
-        text.color = Color.white;
         text.textWrappingMode = TextWrappingModes.NoWrap;
         return text;
     }
 
     void Update()
     {
-        if (isGameOver) return;
+        if (isGameOver) {
+            return;
+        }
         timeRemaining -= Time.deltaTime;
         if (timeRemaining <= 0)
         {
@@ -83,21 +95,14 @@ public class ScoreTableController : MonoBehaviour
         UpdateUI();
     }
 
+    //Changes the score and coin amounts whenever a player shoots. Also creates the shooting meter.
     void UpdateUI()
     {
-        scoreText.text = $"Score: {currentScore} cents";
         timerText.text = $"Time: {Mathf.CeilToInt(timeRemaining)}s";
 
         if (coin != null)
         {
-            string arrow = " <--";
-            string n = coin.CurrentCoinType == Coin2DController.CoinType.Nickel ? arrow : "";
-            string d = coin.CurrentCoinType == Coin2DController.CoinType.Dime ? arrow : "";
-            string q = coin.CurrentCoinType == Coin2DController.CoinType.Quarter ? arrow : "";
-
-            coinInventoryText.text = $"[1] Nickels (5c): {coin.NickelsRemaining}{n}\n[2] Dimes (10c): {coin.DimesRemaining}{d}\n[3] Quarters (25c): {coin.QuartersRemaining}{q}";
-            if (coin.CoinIsSpinning)
-                coinInventoryText.text += $"\n\nSpin Time: {coin.SpinTimeRemaining:F1}s";
+            coinText.text = $"Nickels: {coin.NickelsRemaining}\nDimes: {coin.DimesRemaining}\nQuarters: {coin.QuartersRemaining}\nScore: {currentScore} cents";
             instructionsText.text = "[1/2/3] Select coin type\n[SPACE] Hold to aim, release to shoot!";
 
             if (coin.IsAiming)
@@ -107,37 +112,27 @@ public class ScoreTableController : MonoBehaviour
                 string meter = "[";
                 for (int i = 0; i < 21; i++)
                     meter += i == 10 ? "|" : i == pos ? "O" : "-";
-                meterDisplayText.text = $"AIM: {meter}]\nRelease SPACE to shoot!";
-            }
-            else if (coin.IsShotInProgress)
-                meterDisplayText.text = "SHOT IN PROGRESS...";
-            else if (coin.NickelsRemaining <= 0 && coin.DimesRemaining <= 0 && coin.QuartersRemaining <= 0)
-                meterDisplayText.text = "OUT OF COINS!";
-            else
-                meterDisplayText.text = "Press & hold SPACE to aim";
-        }
+                meterDisplayText.text = $"AIM: {meter}]";
+            }  
+        } 
     }
 
-    public void AddScore(int points) => currentScore += points;
+    public void AddScore(int points)
+    {
+        currentScore += points;
+    } 
     public void OnMiss() { }
     public void OnBlocked() { }
-    public void OnOutOfCoins() => EndGame("YOU'RE OUT OF COINS!");
+    public void OnOutOfCoins() {
+        EndGame("YOU'RE OUT OF COINS!");
+    }
 
     void EndGame(string reason)
     {
         isGameOver = true;
         gameOverText.gameObject.SetActive(true);
-        gameOverText.text = $"GAME OVER!\n{reason}\n\nFinal Score: {currentScore} cents\n\nPress R to restart";
-        StartCoroutine(WaitForRestart());
+        gameOverText.text = $"GAME OVER!\n{reason}\n\nFinal Score: {currentScore} cents\n";
     }
 
-    System.Collections.IEnumerator WaitForRestart()
-    {
-        while (true)
-        {
-            if (Keyboard.current?.rKey.wasPressedThisFrame == true)
-                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-            yield return null;
-        }
-    }
+    
 }

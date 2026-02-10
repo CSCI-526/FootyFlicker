@@ -11,12 +11,7 @@ public class Keeper2DController : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            rb.gravityScale = 0;
-        }
+    
     }
 
     // Update is called once per frame

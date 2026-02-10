@@ -42,7 +42,6 @@ public class Coin2DController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         startPosition = transform.position;
-        rb.bodyType = RigidbodyType2D.Kinematic;
         nickelsRemaining = startingNickels;
         dimesRemaining = startingDimes;
         quartersRemaining = startingQuarters;
@@ -62,23 +61,34 @@ public class Coin2DController : MonoBehaviour
 
     void Update()
     {
-        if (scoreTable != null && scoreTable.IsGameOver) return;
+        if (scoreTable != null && scoreTable.IsGameOver) 
+        {
+            return;
+        }
         var kb = Keyboard.current;
-        if (kb == null) return;
+        if (kb == null)
+        { 
+            return;
+        }
 
         if (!isShotInProgress)
         {
-            if (kb.digit1Key.wasPressedThisFrame && nickelsRemaining > 0) SetCoinType(CoinType.Nickel);
-            else if (kb.digit2Key.wasPressedThisFrame && dimesRemaining > 0) SetCoinType(CoinType.Dime);
-            else if (kb.digit3Key.wasPressedThisFrame && quartersRemaining > 0) SetCoinType(CoinType.Quarter);
+            if (kb.digit1Key.wasPressedThisFrame && nickelsRemaining > 0) 
+                SetCoinType(CoinType.Nickel);
+            else if (kb.digit2Key.wasPressedThisFrame && dimesRemaining > 0) 
+                SetCoinType(CoinType.Dime);
+            else if (kb.digit3Key.wasPressedThisFrame && quartersRemaining > 0) 
+                SetCoinType(CoinType.Quarter);
             if (HasCoinsRemaining() && GetCurrentCoinCount() > 0)
             {
-                if (kb.spaceKey.wasPressedThisFrame) StartAiming();
+                if (kb.spaceKey.wasPressedThisFrame) 
+                    StartAiming();
                 if (isAiming)
                 {
                     // oscillates between -1 and 1 for the aim meter
                     meterValue = Mathf.Sin(Time.time * meterSpeed);
-                    if (kb.spaceKey.wasReleasedThisFrame) Shoot();
+                    if (kb.spaceKey.wasReleasedThisFrame) 
+                        Shoot();
                 }
             }
         }
@@ -88,7 +98,8 @@ public class Coin2DController : MonoBehaviour
         {
             spinTimeRemaining -= Time.deltaTime;
             transform.Rotate(0, 0, 360 * Time.deltaTime);
-            if (spinTimeRemaining <= 0) StopCoin();
+            if (spinTimeRemaining <= 0) 
+                StopCoin();
         }
     }
 
@@ -107,16 +118,34 @@ public class Coin2DController : MonoBehaviour
 
     void UseCoin()
     {
-        if (currentCoinType == CoinType.Nickel) nickelsRemaining--;
-        else if (currentCoinType == CoinType.Dime) dimesRemaining--;
-        else if (currentCoinType == CoinType.Quarter) quartersRemaining--;
+        if (currentCoinType == CoinType.Nickel)
+        {
+            nickelsRemaining--;
+        }
+        else if (currentCoinType == CoinType.Dime)
+        {
+            dimesRemaining--;
+        } 
+        else if (currentCoinType == CoinType.Quarter)
+        {
+            quartersRemaining--;   
+        }
     }
 
     void SelectFirstAvailableCoin()
     {
-        if (nickelsRemaining > 0) SetCoinType(CoinType.Nickel);
-        else if (dimesRemaining > 0) SetCoinType(CoinType.Dime);
-        else if (quartersRemaining > 0) SetCoinType(CoinType.Quarter);
+        if (nickelsRemaining > 0)
+        {
+            SetCoinType(CoinType.Nickel);   
+        }
+        else if (dimesRemaining > 0)
+        {
+            SetCoinType(CoinType.Dime);
+        }
+        else if (quartersRemaining > 0)
+        {
+           SetCoinType(CoinType.Quarter); 
+        }
     }
 
     void SetCoinType(CoinType type)
@@ -158,7 +187,9 @@ public class Coin2DController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0;
         if (transform.position.x < 15f && scoreTable != null)
-            scoreTable.OnMiss();
+        {
+           scoreTable.OnMiss(); 
+        }
 
         Invoke(nameof(ResetCoin), 1f);
     }
@@ -202,18 +233,36 @@ public class Coin2DController : MonoBehaviour
         coinIsSpinning = false;
         meterValue = 0f;
 
-        if (GetCurrentCoinCount() <= 0) SelectFirstAvailableCoin();
-        else SetCoinType(currentCoinType);
-        if (!HasCoinsRemaining()) scoreTable?.OnOutOfCoins();
+        if (GetCurrentCoinCount() <= 0)
+        {
+            SelectFirstAvailableCoin();
+        }
+        else
+        {
+            SetCoinType(currentCoinType);
+        }
+            
+        if (!HasCoinsRemaining())
+        {
+            scoreTable?.OnOutOfCoins();
+        }
+            
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Keeper")) OnBlocked();
+        if (other.CompareTag("Keeper"))
+        {
+            OnBlocked();
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Keeper")) OnBlocked();
+        if (collision.gameObject.CompareTag("Keeper"))
+        {
+           OnBlocked();
+        }
+            
     }
 }
